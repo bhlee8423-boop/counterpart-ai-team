@@ -1,0 +1,291 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#111827">
+<title>Counterpart AI Team</title>
+<style>
+:root{font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#111827;background:#f6f7fb}*{box-sizing:border-box}body{margin:0}.wrap{max-width:1120px;margin:auto;padding:24px}.hero{background:#111827;color:white;border-radius:22px;padding:24px 26px;margin-bottom:18px}.hero h1{margin:0 0 8px;font-size:30px}.hero p{margin:0;color:#cbd5e1;line-height:1.45}.grid{display:grid;grid-template-columns:1.05fr .95fr;gap:16px}.card{background:white;border:1px solid #e5e7eb;border-radius:18px;padding:18px;box-shadow:0 8px 28px rgba(15,23,42,.05)}label{display:block;font-size:13px;font-weight:700;margin:12px 0 6px}input,textarea,button,select{font:inherit}input,textarea{width:100%;border:1px solid #d1d5db;border-radius:12px;padding:11px 12px;background:#fff}textarea{min-height:150px;resize:vertical}.agents{display:grid;grid-template-columns:1fr 1fr;gap:8px}.agent{display:flex;gap:8px;align-items:flex-start;border:1px solid #e5e7eb;border-radius:12px;padding:9px;font-size:13px}.agent input{width:auto;margin-top:2px}.actions{display:flex;gap:10px;align-items:center;margin-top:14px;flex-wrap:wrap}button{border:0;border-radius:12px;padding:11px 15px;font-weight:800;cursor:pointer}.primary{background:#111827;color:white}.secondary{background:#eef2ff;color:#3730a3}.secondary.active{background:#3730a3;color:white}.danger{background:#fef2f2;color:#991b1b}.status{font-size:13px;color:#6b7280}.route{margin-top:10px;padding:9px 11px;border-radius:10px;background:#f0fdf4;color:#166534;font-size:12px;line-height:1.45}.output{white-space:pre-wrap;line-height:1.55;font-size:14px}.tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.tab{background:#f3f4f6;color:#374151;padding:8px 10px;font-size:12px}.tab.active{background:#111827;color:white}.pill{display:inline-block;background:#eef2ff;color:#3730a3;border-radius:999px;padding:4px 8px;font-size:11px;margin:2px}.memory{font-size:13px;line-height:1.45;white-space:pre-wrap;max-height:190px;overflow:auto;background:#f9fafb;border-radius:12px;padding:10px}.small{font-size:12px;color:#6b7280}.hide{display:none}button:disabled{opacity:.5;cursor:not-allowed}.strict{margin-top:12px;color:#86efac;font-size:12px;font-weight:800;letter-spacing:.02em}.external{background:#ecfeff;color:#155e75}.external:disabled{opacity:.5}@media(max-width:800px){.grid{grid-template-columns:1fr}.agents{grid-template-columns:1fr}.wrap{padding:12px}.hero{border-radius:16px}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <h1>Counterpart AI Team</h1>
+    <p>Your specialist AI council. Specialists think independently first, Counterpart Lead resolves conflicts, and ChatGPT Premium Lead can do the final senior review.</p>
+    <div class="strict">STRICT $0 MODE · CLOUDFLARE FREE-PLAN AI · PREMIUM REVIEW VIA YOUR CHATGPT</div>
+  </div>
+
+  <div class="grid">
+    <div class="card">
+      <h2 style="margin:0 0 8px">Ask the team</h2>
+
+      <label for="project">Project</label>
+      <input id="project" value="General" autocomplete="off">
+
+      <label for="goal">Goal / problem</label>
+      <textarea id="goal" placeholder="Describe what you want the team to solve, design, challenge, or decide..."></textarea>
+
+      <label>Specialists</label>
+      <div class="agents" id="agents">
+        <label class="agent"><input type="checkbox" value="inventor" checked><span><strong>Inventor</strong><div class="small">Qwen3 30B</div></span></label>
+        <label class="agent"><input type="checkbox" value="engineer" checked><span><strong>Engineer</strong><div class="small">Mistral Small 3.1</div></span></label>
+        <label class="agent"><input type="checkbox" value="researcher"><span><strong>Researcher</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
+        <label class="agent"><input type="checkbox" value="redteam" checked><span><strong>Red Team</strong><div class="small">Gemma 4 26B</div></span></label>
+        <label class="agent"><input type="checkbox" value="business" checked><span><strong>Business Strategist</strong><div class="small">Qwen3 30B</div></span></label>
+        <label class="agent"><input type="checkbox" value="product" checked><span><strong>Product Designer</strong><div class="small">Gemma 4 26B</div></span></label>
+        <label class="agent"><input type="checkbox" value="architect"><span><strong>Software Architect</strong><div class="small">Mistral Small 3.1</div></span></label>
+        <label class="agent"><input type="checkbox" value="coder"><span><strong>Builder / Coder</strong><div class="small">Qwen3 30B</div></span></label>
+        <label class="agent"><input type="checkbox" value="qa" checked><span><strong>QA &amp; Test</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
+        <label class="agent"><input type="checkbox" value="safety"><span><strong>Safety &amp; Compliance</strong><div class="small">Mistral Small 3.1</div></span></label>
+        <label class="agent"><input type="checkbox" value="manufacturing"><span><strong>Manufacturing</strong><div class="small">Gemma 4 26B</div></span></label>
+        <label class="agent"><input type="checkbox" value="cost"><span><strong>Cost &amp; Simplicity</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
+        <label class="agent"><input type="checkbox" value="customer"><span><strong>Customer Simulator</strong><div class="small">Qwen3 30B</div></span></label>
+        <label class="agent"><input type="checkbox" value="security"><span><strong>Security</strong><div class="small">Mistral Small 3.1</div></span></label>
+        <label class="agent"><input type="checkbox" value="pm"><span><strong>Project Manager</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
+      </div>
+
+      <div class="actions">
+        <button id="smart" class="secondary active" type="button">Smart team</button>
+        <button id="fixed" class="secondary" type="button">Fixed core</button>
+        <button id="all" class="secondary" type="button">All 15</button>
+      </div>
+
+      <label class="agent" style="margin-top:12px"><input id="deep" type="checkbox"><span><strong>Targeted cross-review</strong><div class="small">Challenge material disagreements and unsupported claims after the independent first pass.</div></span></label>
+
+      <div class="actions">
+        <button id="run" class="primary" type="button">Assemble team</button>
+        <button id="copyChatGPT" class="secondary" type="button" disabled>Copy for ChatGPT Premium Lead</button>
+        <button id="openGrok" class="external" type="button" disabled>Open Grok + Copy</button>
+        <span id="status" class="status">Ready.</span>
+      </div>
+
+      <div id="routeMode" class="route">Smart Team is on. Counterpart will route the goal to up to six relevant specialists.</div>
+    </div>
+
+    <div class="card">
+      <h2 style="margin:0 0 6px">Project memory</h2>
+      <div class="small">Stored locally on this device and isolated by project. Add locked decisions, verified facts, constraints, or test results the team should always use.</div>
+
+      <label for="memoryInput">Add memory</label>
+      <textarea id="memoryInput" style="min-height:115px" placeholder="Add a verified fact, decision, constraint, test result, requirement..."></textarea>
+
+      <div class="actions">
+        <button id="addMemory" class="secondary" type="button">Add to memory</button>
+        <button id="clearMemory" class="danger" type="button">Clear project memory</button>
+      </div>
+
+      <label>Current memory</label>
+      <div id="memoryView" class="memory">(none)</div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <div class="tabs">
+      <button class="tab active" data-view="lead" type="button">Lead synthesis</button>
+      <button class="tab" data-view="review" type="button">Targeted review</button>
+      <button class="tab" data-view="specialists" type="button">Specialists</button>
+    </div>
+    <div id="lead" class="output">Run the team to see the Counterpart Lead synthesis.</div>
+    <div id="review" class="output hide">Targeted cross-review was not enabled.</div>
+    <div id="specialists" class="hide"></div>
+  </div>
+</div>
+
+<script>
+const ENDPOINT='https://counterpart-ai-backend.blee12384.workers.dev/api/team';
+const FIXED_CORE=['inventor','engineer','redteam','business','product','qa'];
+let smartMode=true;
+let lastCouncil=null;
+
+function projectName(){return (document.getElementById('project').value.trim()||'General');}
+function normalizedProject(){return projectName().toLowerCase().replace(/\s+/g,'-');}
+function preferredKey(){return `counterpart-memory:${normalizedProject()}`;}
+function existingMemoryKey(){
+  const raw=projectName().toLowerCase().replace(/\s+/g,' ').trim();
+  const hyphen=raw.replace(/\s+/g,'-');
+  const underscore=raw.replace(/\s+/g,'_');
+  const preferred=preferredKey();
+  if(localStorage.getItem(preferred)!==null)return preferred;
+  const candidates=[
+    `counterpart_memory_${raw}`,
+    `counterpart_memory_${hyphen}`,
+    `counterpart_memory_${underscore}`,
+    `counterpart-memory-${raw}`,
+    `counterpart-memory-${hyphen}`,
+    `counterpart:${raw}:memory`,
+    `counterpart:${hyphen}:memory`,
+    `counterpart:${raw}`,
+    `counterpart:${hyphen}`
+  ];
+  for(const k of candidates){if(localStorage.getItem(k)!==null)return k;}
+  for(let i=0;i<localStorage.length;i++){
+    const k=localStorage.key(i)||'';
+    const low=k.toLowerCase();
+    const projectMatch=low.includes(raw)||low.includes(hyphen)||low.includes(underscore);
+    if(projectMatch&&(low.includes('counterpart')||low.includes('memory')))return k;
+  }
+  return preferred;
+}
+function key(){return existingMemoryKey();}
+function currentMemory(){return localStorage.getItem(key())||'';}
+function renderMemory(){document.getElementById('memoryView').textContent=currentMemory()||'(none)';}
+
+function setChecks(ids){
+  const wanted=new Set(ids);
+  document.querySelectorAll('#agents input[type="checkbox"]').forEach(x=>x.checked=wanted.has(x.value));
+}
+function setModeVisual(mode){
+  document.getElementById('smart').classList.toggle('active',mode==='smart');
+  document.getElementById('fixed').classList.toggle('active',mode==='fixed');
+  document.getElementById('all').classList.toggle('active',mode==='all');
+}
+
+document.getElementById('smart').onclick=()=>{
+  smartMode=true;
+  setModeVisual('smart');
+  document.getElementById('routeMode').textContent='Smart Team is on. Counterpart will route the goal to up to six relevant specialists.';
+};
+document.getElementById('fixed').onclick=()=>{
+  smartMode=false;
+  setChecks(FIXED_CORE);
+  setModeVisual('fixed');
+  document.getElementById('routeMode').textContent='Fixed Core selected: Inventor, Engineer, Red Team, Business Strategist, Product Designer, and QA & Test.';
+};
+document.getElementById('all').onclick=()=>{
+  smartMode=false;
+  document.querySelectorAll('#agents input[type="checkbox"]').forEach(x=>x.checked=true);
+  setModeVisual('all');
+  document.getElementById('routeMode').textContent='All 15 specialists selected.';
+};
+document.querySelectorAll('#agents input[type="checkbox"]').forEach(x=>x.addEventListener('change',()=>{
+  smartMode=false;
+  setModeVisual('manual');
+  document.getElementById('routeMode').textContent='Manual team selection is active.';
+}));
+
+document.getElementById('addMemory').onclick=()=>{
+  const box=document.getElementById('memoryInput');
+  const text=box.value.trim();
+  if(!text)return;
+  const old=currentMemory();
+  localStorage.setItem(key(),old?`${old}\n\n${text}`:text);
+  box.value='';
+  renderMemory();
+};
+document.getElementById('clearMemory').onclick=()=>{
+  localStorage.removeItem(key());
+  renderMemory();
+};
+let projectTimer=null;
+document.getElementById('project').addEventListener('input',()=>{
+  clearTimeout(projectTimer);
+  projectTimer=setTimeout(renderMemory,120);
+});
+renderMemory();
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  ['lead','review','specialists'].forEach(id=>document.getElementById(id).classList.toggle('hide',id!==b.dataset.view));
+});
+
+function specialistText(council){
+  return (council?.agents||[]).map(a=>`## ${a.name} (${a.model})\n${a.content||('ERROR: '+(a.error||'Unknown error'))}`).join('\n\n');
+}
+async function copyText(text,fallbackTitle){
+  try{
+    await navigator.clipboard.writeText(text);
+    return true;
+  }catch(e){
+    prompt(fallbackTitle,text);
+    return false;
+  }
+}
+
+document.getElementById('copyChatGPT').onclick=async()=>{
+  if(!lastCouncil)return;
+  const project=projectName();
+  const goal=document.getElementById('goal').value.trim();
+  const specialists=specialistText(lastCouncil);
+  const route=(lastCouncil.meta?.selectedAgentNames||[]).join(', ');
+  const report=`COUNTERPART AI TEAM → CHATGPT PREMIUM LEAD HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nFREE COUNCIL SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SPECIALIST REPORTS:\n${specialists}\n\nINSTRUCTION FOR CHATGPT PREMIUM LEAD:\nAct as the senior integrator. Do not accept the council's consensus automatically. Audit factual grounding, distinguish provided facts from inference, correct unsupported claims, resolve disagreements, preserve useful minority objections, and give me the strongest final recommendation plus the next concrete step.`;
+  const copied=await copyText(report,'Copy this report and paste it into ChatGPT:');
+  document.getElementById('status').textContent=copied?'Copied. Paste it into this ChatGPT conversation.':'Handoff prepared. Copy it from the dialog and paste into ChatGPT.';
+};
+
+document.getElementById('openGrok').onclick=async()=>{
+  if(!lastCouncil)return;
+  const project=projectName();
+  const goal=document.getElementById('goal').value.trim();
+  const memory=currentMemory();
+  const specialists=specialistText(lastCouncil);
+  const route=(lastCouncil.meta?.selectedAgentNames||[]).join(', ');
+  const report=`COUNTERPART AI TEAM → GROK EXTERNAL REVIEWER HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nPROJECT MEMORY / VERIFIED CONTEXT:\n${memory||'(none)'}\n\nCOUNTERPART LEAD SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SELECTED SPECIALIST FINDINGS:\n${specialists}\n\nINSTRUCTION FOR GROK EXTERNAL REVIEWER:\nAct as an independent outside challenger, not a rubber stamp. Audit the reasoning and factual grounding. Distinguish provided facts from inference and unknowns. Identify the strongest blind spots, unsupported claims, missed alternatives, and material risks. Challenge the Counterpart Lead where warranted. Then give your best corrected recommendation and the single most important issue Counterpart should reconsider. Do not claim live evidence or research unless you actually performed it.`;
+  const popup=window.open('https://grok.com/','_blank','noopener,noreferrer');
+  const copied=await copyText(report,'Copy this report, then open Grok:');
+  document.getElementById('status').textContent=popup?(copied?'Copied and opened Grok. Paste and send.':'Grok opened. Copy the handoff from the dialog, then paste and send.'):(copied?'Copied. Open grok.com and paste the handoff.':'Handoff prepared. Open grok.com after copying it from the dialog.');
+};
+
+document.getElementById('run').onclick=async()=>{
+  const goal=document.getElementById('goal').value.trim();
+  if(!goal)return alert('Enter a goal or problem first.');
+  const selected=[...document.querySelectorAll('#agents input:checked')].map(x=>x.value);
+  if(!smartMode&&!selected.length)return alert('Select at least one specialist or turn Smart Team on.');
+  const btn=document.getElementById('run');
+  const st=document.getElementById('status');
+  btn.disabled=true;
+  document.getElementById('copyChatGPT').disabled=true;
+  document.getElementById('openGrok').disabled=true;
+  st.textContent='Specialists are thinking independently…';
+  document.getElementById('lead').textContent='Working…';
+  try{
+    const r=await fetch(ENDPOINT,{
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({
+        project:projectName(),
+        goal,
+        context:currentMemory(),
+        agentIds:selected,
+        smart:smartMode,
+        deep:document.getElementById('deep').checked
+      })
+    });
+    const raw=await r.text();
+    let data;
+    try{data=JSON.parse(raw);}catch(e){throw new Error(raw||`Request failed (${r.status})`);}
+    if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);
+    lastCouncil=data;
+    document.getElementById('copyChatGPT').disabled=false;
+    document.getElementById('openGrok').disabled=false;
+    document.getElementById('lead').textContent=data.synthesis||'(no synthesis)';
+    document.getElementById('review').textContent=data.review||'Targeted cross-review was not enabled.';
+    document.getElementById('specialists').innerHTML='';
+    (data.agents||[]).forEach(a=>{
+      const sec=document.createElement('div');
+      sec.style.marginBottom='24px';
+      sec.innerHTML=`<div><span class="pill"></span><span class="pill"></span></div><div class="output" style="margin-top:8px"></div>`;
+      const pills=sec.querySelectorAll('.pill');
+      pills[0].textContent=a.name||'Specialist';
+      pills[1].textContent=a.model||'';
+      sec.querySelector('.output').textContent=a.content||('ERROR: '+(a.error||'Unknown error'));
+      document.getElementById('specialists').appendChild(sec);
+    });
+    const names=(data.meta?.selectedAgentNames||[]).join(', ');
+    const cats=(data.meta?.route?.matchedCategories||[]).join(', ');
+    document.getElementById('routeMode').textContent=(data.meta?.route?.mode==='smart'?
+      `Smart team used: ${names||'(not reported)'}. Matched: ${cats||'general problem solving'}.`:
+      `Manual team used: ${names||'(not reported)'}.`);
+    st.textContent='Complete.';
+  }catch(e){
+    document.getElementById('lead').textContent='Could not run the team: '+e.message;
+    st.textContent='Error: '+String(e.message||e).slice(0,110);
+  }finally{
+    btn.disabled=false;
+  }
+};
+</script>
+</body>
+</html>
