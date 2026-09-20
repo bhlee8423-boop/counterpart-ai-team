@@ -1,0 +1,17 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "counterpart-ai-backend",
+  "main": "counterpart-ai-backend-v1.2.0-rc.2.js",
+  "compatibility_date": "2026-09-15",
+  "ai": { "binding": "AI" },
+  "vars": {
+    "CF_FREE_TIER_CONFIRMED": "false",
+    "GOOGLE_FREE_TIER_CONFIRMED": "false",
+    "FEDERATION_ALLOW_PAID": "false",
+    "FEDERATION_MAX_PAID_CALLS": "0",
+    "FEDERATION_MAX_CALLS": "48",
+    "FEDERATION_CONCURRENCY": "4",
+    "FEDERATION_TIMEOUT_MS": "25000",
+    "FEDERATION_RUN_TIMEOUT_MS": "120000"
+  }
+}
