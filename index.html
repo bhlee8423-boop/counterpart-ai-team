@@ -14,7 +14,7 @@
   <div class="hero">
     <h1>Counterpart AI Team</h1>
     <p>Your 15-role specialist council. Models answer independently, reviewers challenge disagreements, and the Lead preserves unresolved objections.</p>
-    <div class="strict">STUDY BUILD 4 · COMPLETE-EXCERPT LINK · FREE-FIRST ROUTING</div>
+    <div class="strict">STUDY BUILD 5 · CONNECTION CHECK · FREE-FIRST ROUTING</div>
   </div>
 
   <div class="grid">
@@ -63,11 +63,13 @@
 
       <div class="actions">
         <button id="run" class="primary" type="button">Assemble team</button>
+        <button id="checkConnection" class="secondary" type="button">Check connection</button>
         <button id="copyChatGPT" class="secondary" type="button" disabled>Copy for ChatGPT Premium Lead</button>
         <button id="openGrok" class="external" type="button" disabled>Grok Preview + Copy Full (Study)</button>
         <span id="status" class="status">Ready.</span>
       </div>
 
+      <div id="diagnostic" class="small" role="status" style="margin-top:10px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere">Connection has not been checked.</div>
       <div id="routeMode" class="route">Smart Team is on. Counterpart will route the goal to up to six relevant specialists.</div>
     </div>
 
@@ -115,6 +117,47 @@ function endpointURL(){
   if(url.username||url.password||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw new Error('Use an HTTPS API address.');
   return url.href;
 }
+document.getElementById('checkConnection').onclick=async()=>{
+  const button=document.getElementById('checkConnection');
+  const display=document.getElementById('diagnostic');
+  button.disabled=true;
+  const base=endpointURL();
+  const probe=async name=>{
+    const url=new URL(base);
+    url.searchParams.set('probe',name);
+    url.searchParams.set('cacheBust',String(Date.now()));
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),15000);
+    try{
+      const response=await fetch(url,{method:'GET',cache:'no-store',credentials:'same-origin',signal:controller.signal});
+      const raw=await response.text();
+      const isJSON=response.headers.get('content-type')?.includes('application/json');
+      let data={};
+      if(isJSON){try{data=JSON.parse(raw)}catch(e){}}
+      if(!isJSON && /vercel authentication|sign in|login/i.test(raw)) return 'BLOCKED by Vercel preview sign-in';
+      if(!isJSON) return 'Unexpected response: HTTP '+response.status+', content-type '+(response.headers.get('content-type')||'unknown');
+      if(name==='proxy') return response.ok ? 'OK' : 'HTTP '+response.status+' '+(data.error||'');
+      return response.ok ? 'OK (Cloudflare HTTP '+data.backendStatus+')' :
+        'Cloudflare '+(data.backend||'error')+' (HTTP '+(data.backendStatus||response.status)+'): '+(data.reason||'');
+    }catch(error){
+      if(error?.name==='AbortError')return 'Timed out (15 seconds)';
+      return 'Browser/network blocked the request: '+String(error?.message||error);
+    }finally{clearTimeout(timer)}
+  };
+  try{
+    display.textContent='Checking Vercel preview session...';
+    const proxy=await probe('proxy');
+    display.textContent='Vercel proxy: '+proxy;
+    if(proxy!=='OK'){display.textContent+='\\nIf this is a preview-auth issue, reopen the newest study link in Chrome and sign in to Vercel if prompted.';return;}
+    display.textContent+='\\nChecking Cloudflare backend...';
+    const backend=await probe('backend');
+    display.textContent='Vercel proxy: '+proxy+'\\nCloudflare backend: '+backend;
+    if(backend.startsWith('OK'))display.textContent+='\\nConnection looks healthy. Try a SHORT council task first.';
+  }catch(error){
+    display.textContent='Diagnostic error: '+String(error?.message||error);
+  }finally{button.disabled=false;}
+};
+
 const FIXED_CORE=['inventor','engineer','redteam','business','product','qa'];
 let smartMode=true;
 let lastCouncil=null;
@@ -349,6 +392,9 @@ document.getElementById('run').onclick=async()=>{
     if(e.name==='AbortError')e=new Error('The request timed out. The server may still be finishing; wait before retrying.');
     document.getElementById('runSummary').textContent='This run did not complete.';
     document.getElementById('lead').textContent='Could not run the team: '+e.message;
+    if(/failed to fetch|networkerror|load failed/i.test(String(e.message||e))) {
+      document.getElementById('diagnostic').textContent='Browser could not complete the API request. Tap Check connection to identify whether Vercel preview sign-in or Cloudflare is blocking it. Do NOT retry a long council request blindly; the backend may have completed the previous one.';
+    }
     st.textContent='Error: '+String(e.message||e).slice(0,110);
   }finally{
     clearTimeout(timeout);
