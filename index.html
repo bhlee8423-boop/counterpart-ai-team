@@ -14,7 +14,7 @@
   <div class="hero">
     <h1>Counterpart AI Team</h1>
     <p>Your 15-role specialist council. Models answer independently, reviewers challenge disagreements, and the Lead preserves unresolved objections.</p>
-    <div class="strict">STUDY BUILD 6 · AUTOMATIC REVIEW · FREE-FIRST ROUTING</div>
+    <div class="strict">STUDY BUILD 7 · FREE WEB REVIEWER ROSTER · FREE-FIRST ROUTING</div>
   </div>
 
   <div class="grid">
@@ -67,7 +67,7 @@
         <button id="checkConnection" class="secondary" type="button">Check connection</button>
         <button id="copyChatGPT" class="secondary" type="button" disabled>Copy for ChatGPT Premium Lead</button>
         <button id="openGrok" class="external" type="button" disabled>Grok Preview + Copy Full (Study)</button>
-        <button id="shareCombined" class="secondary" type="button" disabled>Share combined report</button>
+        <button id="shareCombined" class="secondary" type="button" disabled>Share to ChatGPT for web reviewers</button>
         <span id="status" class="status">Ready.</span>
       </div>
 
@@ -97,6 +97,28 @@
         <button id="importLegacy" class="secondary" type="button">Use for this project</button>
       </details>
     </div>
+  </div>
+
+  <div class="card" style="margin-top:16px">
+    <h2 style="margin:0 0 8px">Free web reviewer roster</h2>
+    <p class="small">These are consumer web services with currently verified free access. Selecting them does NOT call them from this page. When you share the combined packet back to ChatGPT, the requested roster is included so ChatGPT can use your authorized TinyFish browser profile to dispatch reviews. TinyFish itself is metered separately. Paid APIs remain off.</p>
+    <div class="agents" id="externalReviewers">
+      <label class="agent"><input type="checkbox" value="grok" checked><span><strong>Grok Free</strong><div class="small">Free consumer web access; TinyFish profile already tested in this study.</div></span></label>
+      <label class="agent"><input type="checkbox" value="higgsfield" checked><span><strong>Higgsfield Free Mode</strong><div class="small">Supercomputer text Free Mode only. Image/video and programmatic usage can cost credits.</div></span></label>
+      <label class="agent"><input type="checkbox" value="claude" checked><span><strong>Claude Free</strong><div class="small">$0 consumer plan with usage limits.</div></span></label>
+      <label class="agent"><input type="checkbox" value="gemini" checked><span><strong>Gemini</strong><div class="small">Consumer access without a paid Google AI plan, subject to usage limits.</div></span></label>
+      <label class="agent"><input type="checkbox" value="deepseek" checked><span><strong>DeepSeek</strong><div class="small">Official consumer chat is free; API is separate.</div></span></label>
+      <label class="agent"><input type="checkbox" value="perplexity" checked><span><strong>Perplexity Standard</strong><div class="small">Free plan; advanced searches/models are limited.</div></span></label>
+      <label class="agent"><input type="checkbox" value="mistral" checked><span><strong>Mistral Vibe Free</strong><div class="small">Free plan for quick answers, web search and simple tasks.</div></span></label>
+      <label class="agent"><input type="checkbox" value="qwen" checked><span><strong>Qwen</strong><div class="small">Official web assistant is free to use.</div></span></label>
+      <label class="agent"><input type="checkbox" value="copilot"><span><strong>Microsoft Copilot Free</strong><div class="small">Free personal web AI; availability/features can vary by region.</div></span></label>
+      <label class="agent"><input type="checkbox" value="duckai"><span><strong>Duck.ai</strong><div class="small">Free anonymized access to several AI models; do not count duplicates as independent model families.</div></span></label>
+    </div>
+    <div class="actions">
+      <button id="allExternal" class="secondary" type="button">Select all free web reviewers</button>
+      <button id="coreExternal" class="secondary" type="button">Core 6</button>
+    </div>
+    <div class="small" style="margin-top:10px">Recommended default: Grok, Higgsfield, Claude, Gemini, DeepSeek, Perplexity. More reviewers increase TinyFish browser cost and time even when the AI service itself is free.</div>
   </div>
 
   <div class="card" style="margin-top:16px">
@@ -174,6 +196,10 @@ const FIXED_CORE=['inventor','engineer','redteam','business','product','qa'];
 let smartMode=true;
 let lastCouncil=null;
 let lastAutoResult=null;
+const EXTERNAL_REVIEWER_LABELS={grok:'Grok Free',higgsfield:'Higgsfield Free Mode',claude:'Claude Free',gemini:'Gemini',deepseek:'DeepSeek',perplexity:'Perplexity Standard',mistral:'Mistral Vibe Free',qwen:'Qwen',copilot:'Microsoft Copilot Free',duckai:'Duck.ai'};
+function selectedExternalReviewers(){return [...document.querySelectorAll('#externalReviewers input:checked')].map(x=>({id:x.value,label:EXTERNAL_REVIEWER_LABELS[x.value]||x.value}));}
+document.getElementById('allExternal').onclick=()=>document.querySelectorAll('#externalReviewers input').forEach(x=>x.checked=true);
+document.getElementById('coreExternal').onclick=()=>{const core=new Set(['grok','higgsfield','claude','gemini','deepseek','perplexity']);document.querySelectorAll('#externalReviewers input').forEach(x=>x.checked=core.has(x.value));};
 
 function projectName(){return (document.getElementById('project').value.trim()||'General');}
 function normalizedProject(){return projectName().toLowerCase().replace(/\s+/g,' ').trim();}
@@ -353,10 +379,13 @@ function combinedPacket(){
   const agents=(lastCouncil.agents||[]).map(x=>
     [x.name, x.model, x.provenance?.provider||'unknown', x.provenance?.family||'unknown'].join(' / ')
     +'\n'+(x.content||'[unavailable]')).join('\n\n');
+  const requested=selectedExternalReviewers();
   return [
     'COUNTERPART FULL REVIEW PACKET',
     'PROJECT: '+project,
     'GOAL: '+goal,
+    'EXTERNAL_WEB_REVIEWERS_REQUESTED: '+(requested.length?requested.map(x=>x.label).join(', '):'None'),
+    'EXTERNAL_REVIEW_PROTOCOL: Use authorized browser sessions only. Do not call paid APIs automatically. Each returned review must state its actual provider/service and model if visible. Treat duplicate underlying model families as non-independent evidence. Higgsfield means Supercomputer text Free Mode only unless the user explicitly approves credits.',
     'INITIAL COUNCIL SYNTHESIS\n'+(lastCouncil.synthesis||''),
     'TARGETED REVIEW\n'+(lastCouncil.review||'Not requested'),
     'SPECIALIST FIRST PASSES\n'+agents,
@@ -369,7 +398,7 @@ function combinedPacket(){
 document.getElementById('shareCombined').onclick=async()=>{
   const packet=combinedPacket(); if(!packet)return;
   if(navigator.share){
-    try{await navigator.share({title:'Counterpart complete report',text:packet});return;}
+    try{await navigator.share({title:'Counterpart external-review packet',text:packet});return;}
     catch(e){if(e?.name==='AbortError')return;}
   }
   await copyText(packet,'Copy the complete report to share:');
