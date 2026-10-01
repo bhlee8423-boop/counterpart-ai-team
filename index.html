@@ -240,14 +240,14 @@ document.getElementById('openGrok').onclick=async()=>{
   const report=`COUNTERPART AI TEAM → GROK EXTERNAL REVIEWER HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nPROJECT MEMORY / VERIFIED CONTEXT:\n${memory||'(none)'}\n\nCOUNTERPART LEAD SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SELECTED SPECIALIST FINDINGS:\n${specialists}\n\nINSTRUCTION FOR GROK EXTERNAL REVIEWER:\nAct as an independent outside challenger, not a rubber stamp. Audit the reasoning and factual grounding. Distinguish provided facts from inference and unknowns. Identify the strongest blind spots, unsupported claims, missed alternatives, and material risks. Challenge the Counterpart Lead where warranted. Then give your best corrected recommendation and the single most important issue Counterpart should reconsider. Do not claim live evidence or research unless you actually performed it.`;
   // Small URL-prefill only: sending a multi-page report in the query can trigger
   // HTTP 431 on mobile browsers. Copy the unabridged report separately.
-  const briefText=value=>String(value||'').replace(/\\s+/g,' ').trim();
+  const briefText=value=>String(value||'').replace(/\s+/g,' ').trim();
   const clip=(value,max)=>Array.from(briefText(value)).slice(0,max).join('');
   const brief=[
     'COUNTERPART QUICK REVIEW: Independently challenge this proposal. Flag blind spots, unsupported claims, and major risks.',
     'Goal: '+clip(goal,140),
     'Council proposal: '+clip(lastCouncil.synthesis,245),
     lastCouncil.review?'Cross-review: '+clip(lastCouncil.review,85):''
-  ].filter(Boolean).join('\\n\\n');
+  ].filter(Boolean).join('\n\n');
   const base='https://grok.com/?q=';
   let prefill=brief;
   // Strict encoded URL cap, including non-ASCII text. Avoid splitting Unicode.
