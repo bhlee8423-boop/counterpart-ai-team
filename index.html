@@ -24,7 +24,7 @@
       <details>
         <summary class="small">Connection settings</summary>
         <label for="endpoint">Team API address</label>
-        <input id="endpoint" type="url" value="https://counterpart-ai-backend.blee12384.workers.dev/api/team" spellcheck="false">
+        <input id="endpoint" type="url" value="/api/team" spellcheck="false">
         <label for="accessKey">Access key, if required</label>
         <input id="accessKey" type="password" autocomplete="off" placeholder="Kept only while this page is open">
       </details>
@@ -111,7 +111,7 @@
 <script>
 function endpointURL(){
   const value=document.getElementById('endpoint').value.trim();
-  const url=new URL(value);
+  const url=new URL(value,location.origin);
   if(url.username||url.password||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw new Error('Use an HTTPS API address.');
   return url.href;
 }
