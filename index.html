@@ -13,14 +13,21 @@
 <div class="wrap">
   <div class="hero">
     <h1>Counterpart AI Team</h1>
-    <p>Your specialist AI council. Specialists think independently first, Counterpart Lead resolves conflicts, and ChatGPT Premium Lead can do the final senior review.</p>
-    <div class="strict">STRICT $0 MODE · CLOUDFLARE FREE-PLAN AI · PREMIUM REVIEW VIA YOUR CHATGPT</div>
+    <p>Your 15-role specialist council. Models answer independently, reviewers challenge disagreements, and the Lead preserves unresolved objections.</p>
+    <div class="strict">FREE-FIRST ROUTING · PAID PROVIDERS DISABLED BY DEFAULT</div>
   </div>
 
   <div class="grid">
     <div class="card">
       <h2 style="margin:0 0 8px">Ask the team</h2>
 
+      <details>
+        <summary class="small">Connection settings</summary>
+        <label for="endpoint">Team API address</label>
+        <input id="endpoint" type="url" value="https://counterpart-ai-backend.blee12384.workers.dev/api/team" spellcheck="false">
+        <label for="accessKey">Access key, if required</label>
+        <input id="accessKey" type="password" autocomplete="off" placeholder="Kept only while this page is open">
+      </details>
       <label for="project">Project</label>
       <input id="project" value="General" autocomplete="off">
 
@@ -29,21 +36,21 @@
 
       <label>Specialists</label>
       <div class="agents" id="agents">
-        <label class="agent"><input type="checkbox" value="inventor" checked><span><strong>Inventor</strong><div class="small">Qwen3 30B</div></span></label>
-        <label class="agent"><input type="checkbox" value="engineer" checked><span><strong>Engineer</strong><div class="small">Mistral Small 3.1</div></span></label>
-        <label class="agent"><input type="checkbox" value="researcher"><span><strong>Researcher</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
-        <label class="agent"><input type="checkbox" value="redteam" checked><span><strong>Red Team</strong><div class="small">Gemma 4 26B</div></span></label>
-        <label class="agent"><input type="checkbox" value="business" checked><span><strong>Business Strategist</strong><div class="small">Qwen3 30B</div></span></label>
-        <label class="agent"><input type="checkbox" value="product" checked><span><strong>Product Designer</strong><div class="small">Gemma 4 26B</div></span></label>
-        <label class="agent"><input type="checkbox" value="architect"><span><strong>Software Architect</strong><div class="small">Mistral Small 3.1</div></span></label>
-        <label class="agent"><input type="checkbox" value="coder"><span><strong>Builder / Coder</strong><div class="small">Qwen3 30B</div></span></label>
-        <label class="agent"><input type="checkbox" value="qa" checked><span><strong>QA &amp; Test</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
-        <label class="agent"><input type="checkbox" value="safety"><span><strong>Safety &amp; Compliance</strong><div class="small">Mistral Small 3.1</div></span></label>
-        <label class="agent"><input type="checkbox" value="manufacturing"><span><strong>Manufacturing</strong><div class="small">Gemma 4 26B</div></span></label>
-        <label class="agent"><input type="checkbox" value="cost"><span><strong>Cost &amp; Simplicity</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
-        <label class="agent"><input type="checkbox" value="customer"><span><strong>Customer Simulator</strong><div class="small">Qwen3 30B</div></span></label>
-        <label class="agent"><input type="checkbox" value="security"><span><strong>Security</strong><div class="small">Mistral Small 3.1</div></span></label>
-        <label class="agent"><input type="checkbox" value="pm"><span><strong>Project Manager</strong><div class="small">Llama 3.1 8B Fast</div></span></label>
+        <label class="agent"><input type="checkbox" value="inventor" checked><span><strong>Inventor</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="engineer" checked><span><strong>Engineer</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="researcher"><span><strong>Researcher</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="redteam" checked><span><strong>Red Team</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="business" checked><span><strong>Business Strategist</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="product" checked><span><strong>Product Designer</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="architect"><span><strong>Software Architect</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="coder"><span><strong>Builder / Coder</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="qa" checked><span><strong>QA &amp; Test</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="safety"><span><strong>Safety &amp; Compliance</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="manufacturing"><span><strong>Manufacturing</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="cost"><span><strong>Cost &amp; Simplicity</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="customer"><span><strong>Customer Simulator</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="security"><span><strong>Security</strong><div class="small">Model selected for this run</div></span></label>
+        <label class="agent"><input type="checkbox" value="pm"><span><strong>Project Manager</strong><div class="small">Model selected for this run</div></span></label>
       </div>
 
       <div class="actions">
@@ -57,7 +64,7 @@
       <div class="actions">
         <button id="run" class="primary" type="button">Assemble team</button>
         <button id="copyChatGPT" class="secondary" type="button" disabled>Copy for ChatGPT Premium Lead</button>
-        <button id="openGrok" class="external" type="button" disabled>Open Grok + Copy</button>
+        <button id="openGrok" class="external" type="button" disabled>Grok One-Click (Study)</button>
         <span id="status" class="status">Ready.</span>
       </div>
 
@@ -78,10 +85,18 @@
 
       <label>Current memory</label>
       <div id="memoryView" class="memory">(none)</div>
+      <details id="legacyMemory" class="hide" style="margin-top:12px">
+        <summary>Review older saved memory</summary>
+        <p class="small">Older versions sometimes combined similar project names. Import only if this memory belongs to the current project.</p>
+        <select id="legacyChoice" aria-label="Older saved memory"></select>
+        <div id="legacyPreview" class="memory"></div>
+        <button id="importLegacy" class="secondary" type="button">Use for this project</button>
+      </details>
     </div>
   </div>
 
   <div class="card" style="margin-top:16px">
+    <div id="runSummary" class="small" role="status" style="margin-bottom:12px">Provider and model details appear after a run.</div>
     <div class="tabs">
       <button class="tab active" data-view="lead" type="button">Lead synthesis</button>
       <button class="tab" data-view="review" type="button">Targeted review</button>
@@ -94,43 +109,41 @@
 </div>
 
 <script>
-const ENDPOINT='https://counterpart-ai-backend.blee12384.workers.dev/api/team';
+function endpointURL(){
+  const value=document.getElementById('endpoint').value.trim();
+  const url=new URL(value);
+  if(url.username||url.password||!(url.protocol==='https:'||(url.protocol==='http:'&&['localhost','127.0.0.1'].includes(url.hostname))))throw new Error('Use an HTTPS API address.');
+  return url.href;
+}
 const FIXED_CORE=['inventor','engineer','redteam','business','product','qa'];
 let smartMode=true;
 let lastCouncil=null;
 
 function projectName(){return (document.getElementById('project').value.trim()||'General');}
-function normalizedProject(){return projectName().toLowerCase().replace(/\s+/g,'-');}
-function preferredKey(){return `counterpart-memory:${normalizedProject()}`;}
-function existingMemoryKey(){
-  const raw=projectName().toLowerCase().replace(/\s+/g,' ').trim();
-  const hyphen=raw.replace(/\s+/g,'-');
-  const underscore=raw.replace(/\s+/g,'_');
-  const preferred=preferredKey();
-  if(localStorage.getItem(preferred)!==null)return preferred;
-  const candidates=[
-    `counterpart_memory_${raw}`,
-    `counterpart_memory_${hyphen}`,
-    `counterpart_memory_${underscore}`,
-    `counterpart-memory-${raw}`,
-    `counterpart-memory-${hyphen}`,
-    `counterpart:${raw}:memory`,
-    `counterpart:${hyphen}:memory`,
-    `counterpart:${raw}`,
-    `counterpart:${hyphen}`
-  ];
-  for(const k of candidates){if(localStorage.getItem(k)!==null)return k;}
-  for(let i=0;i<localStorage.length;i++){
-    const k=localStorage.key(i)||'';
-    const low=k.toLowerCase();
-    const projectMatch=low.includes(raw)||low.includes(hyphen)||low.includes(underscore);
-    if(projectMatch&&(low.includes('counterpart')||low.includes('memory')))return k;
-  }
-  return preferred;
+function normalizedProject(){return projectName().toLowerCase().replace(/\s+/g,' ').trim();}
+function preferredKey(){return `counterpart-memory:v2:${encodeURIComponent(normalizedProject())}`;}
+function legacyMemoryKeys(){
+  const raw=normalizedProject(), hyphen=raw.replace(/\s+/g,'-'), underscore=raw.replace(/\s+/g,'_');
+  return [...new Set([`counterpart-memory:${hyphen}`,...[raw,hyphen,underscore].flatMap(n=>[
+    `counterpart_memory_${n}`,`counterpart-memory-${n}`,`counterpart:${n}:memory`,`counterpart:${n}`])])]
+    .filter(k=>localStorage.getItem(k)!==null);
 }
-function key(){return existingMemoryKey();}
+function key(){return preferredKey();}
 function currentMemory(){return localStorage.getItem(key())||'';}
-function renderMemory(){document.getElementById('memoryView').textContent=currentMemory()||'(none)';}
+function renderMemory(){
+  document.getElementById('memoryView').textContent=currentMemory()||'(none)';
+  const keys=legacyMemoryKeys();
+  const show=localStorage.getItem(key())===null&&keys.length>0;
+  document.getElementById('legacyMemory').classList.toggle('hide',!show);
+  const choice=document.getElementById('legacyChoice'); choice.replaceChildren();
+  keys.forEach(k=>{const option=document.createElement('option');option.value=k;option.textContent=k;choice.appendChild(option);});
+  document.getElementById('legacyPreview').textContent=show?(localStorage.getItem(choice.value)||''):'';
+}
+function invalidateCouncil(){
+  lastCouncil=null;
+  document.getElementById('copyChatGPT').disabled=true;
+  document.getElementById('openGrok').disabled=true;
+}
 
 function setChecks(ids){
   const wanted=new Set(ids);
@@ -175,7 +188,7 @@ document.getElementById('addMemory').onclick=()=>{
   renderMemory();
 };
 document.getElementById('clearMemory').onclick=()=>{
-  localStorage.removeItem(key());
+  localStorage.setItem(key(),'');
   renderMemory();
 };
 let projectTimer=null;
@@ -184,6 +197,8 @@ document.getElementById('project').addEventListener('input',()=>{
   projectTimer=setTimeout(renderMemory,120);
 });
 renderMemory();
+document.getElementById('legacyChoice').onchange=()=>{document.getElementById('legacyPreview').textContent=localStorage.getItem(document.getElementById('legacyChoice').value)||'';};
+document.getElementById('importLegacy').onclick=()=>{localStorage.setItem(key(),localStorage.getItem(document.getElementById('legacyChoice').value)||'');renderMemory();};
 
 document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
   document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
@@ -192,7 +207,7 @@ document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{
 });
 
 function specialistText(council){
-  return (council?.agents||[]).map(a=>`## ${a.name} (${a.model})\n${a.content||('ERROR: '+(a.error||'Unknown error'))}`).join('\n\n');
+  return (council?.agents||[]).map(a=>`## ${a.name} (${a.model}; ${a.provenance?.provider||'provider unreported'} / ${a.provenance?.family||'family unreported'}; ${a.status||'status unreported'})\n${a.content||('ERROR: '+(a.error||'Unknown error'))}`).join('\n\n');
 }
 async function copyText(text,fallbackTitle){
   try{
@@ -206,26 +221,37 @@ async function copyText(text,fallbackTitle){
 
 document.getElementById('copyChatGPT').onclick=async()=>{
   if(!lastCouncil)return;
-  const project=projectName();
-  const goal=document.getElementById('goal').value.trim();
+  const project=lastCouncil.request.project;
+  const goal=lastCouncil.request.goal;
   const specialists=specialistText(lastCouncil);
   const route=(lastCouncil.meta?.selectedAgentNames||[]).join(', ');
-  const report=`COUNTERPART AI TEAM → CHATGPT PREMIUM LEAD HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nFREE COUNCIL SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SPECIALIST REPORTS:\n${specialists}\n\nINSTRUCTION FOR CHATGPT PREMIUM LEAD:\nAct as the senior integrator. Do not accept the council's consensus automatically. Audit factual grounding, distinguish provided facts from inference, correct unsupported claims, resolve disagreements, preserve useful minority objections, and give me the strongest final recommendation plus the next concrete step.`;
+  const report=`COUNTERPART AI TEAM → CHATGPT PREMIUM LEAD HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nLOCKED PROJECT MEMORY:\n${lastCouncil.request.context||'(none)'}\n\nRUN LIMITATIONS:\n${(lastCouncil.meta?.warnings||[]).join(' ')||'(none reported)'}\nFIRST-PASS DIGEST: ${lastCouncil.meta?.firstPass?.digest||'(older backend)'}\n\nCOUNTERPART COUNCIL SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SPECIALIST REPORTS:\n${specialists}\n\nINSTRUCTION FOR CHATGPT PREMIUM LEAD:\nAct as the senior integrator. Do not accept the council's consensus automatically. Audit factual grounding, distinguish provided facts from inference, correct unsupported claims, resolve disagreements, preserve useful minority objections, and give me the strongest final recommendation plus the next concrete step.`;
   const copied=await copyText(report,'Copy this report and paste it into ChatGPT:');
   document.getElementById('status').textContent=copied?'Copied. Paste it into this ChatGPT conversation.':'Handoff prepared. Copy it from the dialog and paste into ChatGPT.';
 };
 
 document.getElementById('openGrok').onclick=async()=>{
   if(!lastCouncil)return;
-  const project=projectName();
-  const goal=document.getElementById('goal').value.trim();
-  const memory=currentMemory();
+  const project=lastCouncil.request.project;
+  const goal=lastCouncil.request.goal;
+  const memory=lastCouncil.request.context;
   const specialists=specialistText(lastCouncil);
   const route=(lastCouncil.meta?.selectedAgentNames||[]).join(', ');
   const report=`COUNTERPART AI TEAM → GROK EXTERNAL REVIEWER HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nPROJECT MEMORY / VERIFIED CONTEXT:\n${memory||'(none)'}\n\nCOUNTERPART LEAD SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SELECTED SPECIALIST FINDINGS:\n${specialists}\n\nINSTRUCTION FOR GROK EXTERNAL REVIEWER:\nAct as an independent outside challenger, not a rubber stamp. Audit the reasoning and factual grounding. Distinguish provided facts from inference and unknowns. Identify the strongest blind spots, unsupported claims, missed alternatives, and material risks. Challenge the Counterpart Lead where warranted. Then give your best corrected recommendation and the single most important issue Counterpart should reconsider. Do not claim live evidence or research unless you actually performed it.`;
-  const popup=window.open('https://grok.com/','_blank','noopener,noreferrer');
-  const copied=await copyText(report,'Copy this report, then open Grok:');
-  document.getElementById('status').textContent=popup?(copied?'Copied and opened Grok. Paste and send.':'Grok opened. Copy the handoff from the dialog, then paste and send.'):(copied?'Copied. Open grok.com and paste the handoff.':'Handoff prepared. Open grok.com after copying it from the dialog.');
+  // Study-mode one-click handoff. Grok supports prompt-prefill links and may ask
+  // the signed-in user to confirm before sending. Keep the URL packet compact so
+  // normal browser/proxy URL limits are not exceeded; the complete packet is
+  // copied to the clipboard as a fallback without changing the $0 workflow.
+  const MAX_GROK_PREFILL_CHARS=6500;
+  const prefillReport=report.length<=MAX_GROK_PREFILL_CHARS
+    ? report
+    : `${report.slice(0,MAX_GROK_PREFILL_CHARS)}\n\n[Counterpart study handoff shortened for Grok's URL-prefill limit. The complete packet has also been copied to your clipboard.]`;
+  const grokURL=`https://grok.com/?q=${encodeURIComponent(prefillReport)}`;
+  const copied=await copyText(report,'Copy this full report if Grok did not preload it:');
+  const popup=window.open(grokURL,'_blank','noopener,noreferrer');
+  document.getElementById('status').textContent=popup
+    ? (copied?'Grok opened with the review prefilled. Confirm/send there. Full packet copied as fallback.':'Grok opened with the review prefilled. Confirm/send there.')
+    : (copied?'Full packet copied. Your browser blocked the Grok tab.':'Grok handoff prepared, but the browser blocked the new tab.');
 };
 
 document.getElementById('run').onclick=async()=>{
@@ -236,28 +262,30 @@ document.getElementById('run').onclick=async()=>{
   const btn=document.getElementById('run');
   const st=document.getElementById('status');
   btn.disabled=true;
+  invalidateCouncil();
+  document.getElementById('review').textContent='Awaiting this run.';
+  document.getElementById('specialists').replaceChildren();
+  document.getElementById('runSummary').textContent='Waiting for provider results…';
   document.getElementById('copyChatGPT').disabled=true;
   document.getElementById('openGrok').disabled=true;
   st.textContent='Specialists are thinking independently…';
   document.getElementById('lead').textContent='Working…';
+  const controller=new AbortController();
+  const timeout=setTimeout(()=>controller.abort(),190000);
   try{
-    const r=await fetch(ENDPOINT,{
+    const submitted={project:projectName(),goal,context:currentMemory(),agentIds:selected,smart:smartMode,deep:document.getElementById('deep').checked};
+    const accessKey=document.getElementById('accessKey').value;
+    const r=await fetch(endpointURL(),{
       method:'POST',
-      headers:{'Content-Type':'application/json'},
-      body:JSON.stringify({
-        project:projectName(),
-        goal,
-        context:currentMemory(),
-        agentIds:selected,
-        smart:smartMode,
-        deep:document.getElementById('deep').checked
-      })
+      signal:controller.signal,
+      headers:{'Content-Type':'application/json',...(accessKey?{'X-Counterpart-Key':accessKey}:{})},
+      body:JSON.stringify(submitted)
     });
     const raw=await r.text();
     let data;
-    try{data=JSON.parse(raw);}catch(e){throw new Error(raw||`Request failed (${r.status})`);}
+    try{data=JSON.parse(raw);}catch(e){throw new Error(`Server returned an unreadable response (${r.status}).`);}
     if(!r.ok)throw new Error(data.error||`Request failed (${r.status})`);
-    lastCouncil=data;
+    lastCouncil={...data,request:submitted};
     document.getElementById('copyChatGPT').disabled=false;
     document.getElementById('openGrok').disabled=false;
     document.getElementById('lead').textContent=data.synthesis||'(no synthesis)';
@@ -269,7 +297,7 @@ document.getElementById('run').onclick=async()=>{
       sec.innerHTML=`<div><span class="pill"></span><span class="pill"></span></div><div class="output" style="margin-top:8px"></div>`;
       const pills=sec.querySelectorAll('.pill');
       pills[0].textContent=a.name||'Specialist';
-      pills[1].textContent=a.model||'';
+      pills[1].textContent=[a.model,a.provenance?.provider,a.provenance?.family,a.status==='abstained'?'Abstained':a.provenance?.fallbackUsed?'Fallback used':''].filter(Boolean).join(' · ');
       sec.querySelector('.output').textContent=a.content||('ERROR: '+(a.error||'Unknown error'));
       document.getElementById('specialists').appendChild(sec);
     });
@@ -278,11 +306,18 @@ document.getElementById('run').onclick=async()=>{
     document.getElementById('routeMode').textContent=(data.meta?.route?.mode==='smart'?
       `Smart team used: ${names||'(not reported)'}. Matched: ${cats||'general problem solving'}.`:
       `Manual team used: ${names||'(not reported)'}.`);
-    st.textContent='Complete.';
+    const diversity=data.meta?.diversity;
+    const summary=diversity?`${diversity.modelFamilies} model families across ${diversity.servingProviders} serving provider(s). Lead: ${data.meta.leadModel}.`:'This backend does not report model-family provenance.';
+    const warnings=(data.meta?.warnings||[]).join(' ');
+    document.getElementById('runSummary').textContent=[summary,warnings].filter(Boolean).join(' ');
+    st.textContent=warnings?'Complete. Review the run limitations.':'Complete.';
   }catch(e){
+    if(e.name==='AbortError')e=new Error('The request timed out. The server may still be finishing; wait before retrying.');
+    document.getElementById('runSummary').textContent='This run did not complete.';
     document.getElementById('lead').textContent='Could not run the team: '+e.message;
     st.textContent='Error: '+String(e.message||e).slice(0,110);
   }finally{
+    clearTimeout(timeout);
     btn.disabled=false;
   }
 };
