@@ -14,7 +14,7 @@
   <div class="hero">
     <h1>Counterpart AI Team</h1>
     <p>Your 15-role specialist council. Models answer independently, reviewers challenge disagreements, and the Lead preserves unresolved objections.</p>
-    <div class="strict">STUDY BUILD 3 · GROK LINK FIX · FREE-FIRST ROUTING</div>
+    <div class="strict">STUDY BUILD 4 · COMPLETE-EXCERPT LINK · FREE-FIRST ROUTING</div>
   </div>
 
   <div class="grid">
@@ -64,7 +64,7 @@
       <div class="actions">
         <button id="run" class="primary" type="button">Assemble team</button>
         <button id="copyChatGPT" class="secondary" type="button" disabled>Copy for ChatGPT Premium Lead</button>
-        <button id="openGrok" class="external" type="button" disabled>Grok Quick Review (Study)</button>
+        <button id="openGrok" class="external" type="button" disabled>Grok Preview + Copy Full (Study)</button>
         <span id="status" class="status">Ready.</span>
       </div>
 
@@ -238,34 +238,54 @@ document.getElementById('openGrok').onclick=async()=>{
   const specialists=specialistText(lastCouncil);
   const route=(lastCouncil.meta?.selectedAgentNames||[]).join(', ');
   const report=`COUNTERPART AI TEAM → GROK EXTERNAL REVIEWER HANDOFF\n\nPROJECT: ${project}\nGOAL: ${goal}\nROUTED SPECIALISTS: ${route||'(not reported)'}\n\nPROJECT MEMORY / VERIFIED CONTEXT:\n${memory||'(none)'}\n\nCOUNTERPART LEAD SYNTHESIS:\n${lastCouncil.synthesis||'(none)'}\n\n${lastCouncil.review?`TARGETED CROSS-REVIEW:\n${lastCouncil.review}\n\n`:''}SELECTED SPECIALIST FINDINGS:\n${specialists}\n\nINSTRUCTION FOR GROK EXTERNAL REVIEWER:\nAct as an independent outside challenger, not a rubber stamp. Audit the reasoning and factual grounding. Distinguish provided facts from inference and unknowns. Identify the strongest blind spots, unsupported claims, missed alternatives, and material risks. Challenge the Counterpart Lead where warranted. Then give your best corrected recommendation and the single most important issue Counterpart should reconsider. Do not claim live evidence or research unless you actually performed it.`;
-  // Small URL-prefill only: sending a multi-page report in the query can trigger
-  // HTTP 431 on mobile browsers. Copy the unabridged report separately.
-  const briefText=value=>String(value||'').replace(/\s+/g,' ').trim();
-  const clip=(value,max)=>Array.from(briefText(value)).slice(0,max).join('');
-  const brief=[
-    'COUNTERPART QUICK REVIEW: Independently challenge this proposal. Flag blind spots, unsupported claims, and major risks.',
-    'Goal: '+clip(goal,140),
-    'Council proposal: '+clip(lastCouncil.synthesis,245),
-    lastCouncil.review?'Cross-review: '+clip(lastCouncil.review,85):''
+  // This is a preview link, not an API request or automatic Grok submission.
+  // Send only coherent whole-sentence/whole-word excerpts; keep the full report
+  // on the clipboard for anyone who wants a substantive multi-agent review.
+  const clean = value => String(value || '')
+    .replace(/[#*_`]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+  const excerpt = (value, max) => {
+    const full = clean(value);
+    if (full.length <= max) return full;
+    const windowText = Array.from(full).slice(0,max+1).join('');
+    const sentenceEnd = [...windowText.matchAll(/[.!?](?=\s|$)/g)]
+      .map(match => match.index + 1)
+      .filter(position => position >= Math.min(45, max * .4) && position <= max)
+      .pop();
+    if (sentenceEnd) return windowText.slice(0,sentenceEnd);
+    const candidate = Array.from(full).slice(0,max).join('');
+    const wordEnd = candidate.lastIndexOf(' ');
+    return (wordEnd > max * .5 ? candidate.slice(0,wordEnd) : candidate) + '…';
+  };
+  const intro = 'COUNTERPART SHORT REVIEW (excerpt only): Challenge the approach. Identify unsupported assumptions, material risks, and a lower-cost alternative.';
+  const buildBrief = (goalSize, synthesisSize, reviewSize) => [
+    intro,
+    'Goal: ' + excerpt(goal, goalSize),
+    'Council view: ' + excerpt(lastCouncil.synthesis, synthesisSize),
+    reviewSize && lastCouncil.review ? 'Cross-review excerpt: ' + excerpt(lastCouncil.review, reviewSize) : '',
+    'For full-context review, ask for the complete report.'
   ].filter(Boolean).join('\n\n');
-  const base='https://grok.com/?q=';
-  let prefill=brief;
-  // Strict encoded URL cap, including non-ASCII text. Avoid splitting Unicode.
-  while ((base+encodeURIComponent(prefill)).length>1200 && Array.from(prefill).length>1) {
-    prefill=Array.from(prefill).slice(0,-12).join('');
-  }
-  const grokURL=base+encodeURIComponent(prefill);
-  // Keep the complete packet available for the user; never silently imply that
-  // the short URL contains the whole council transcript.
-  const popup=window.open(grokURL,'_blank','noopener,noreferrer');
-  const copied=await copyText(report,'Copy the complete report and paste it into Grok if you want full-context review:');
-  document.getElementById('status').textContent=popup
+  const base = 'https://grok.com/?q=';
+  const candidates = [
+    buildBrief(135, 235, 110),
+    buildBrief(115, 185, 0),
+    buildBrief(90, 125, 0),
+    intro + '\n\n' + 'Goal: ' + excerpt(goal, 65)
+  ];
+  const prefill = candidates.find(candidate =>
+    (base + encodeURIComponent(candidate)).length <= 1200
+  ) || intro;
+  const grokURL = base + encodeURIComponent(prefill);
+  const popup = window.open(grokURL,'_blank','noopener,noreferrer');
+  const copied=await copyText(report,'Copy the full Counterpart report for a complete Grok review:');
+  document.getElementById('status').textContent = popup
     ? (copied
-      ? 'Grok opened with a SHORT review brief (to avoid HTTP 431). Full council report copied; paste it into Grok for a complete review.'
-      : 'Grok opened with a short review brief. Full packet is available in the copy dialog; paste for full context.')
+      ? 'Grok preview opened with a short, coherent excerpt. Sign in/open Grok and send to get a reply. The FULL council report was copied for an in-depth review.'
+      : 'Grok preview opened. Sign in/open Grok and send to get a reply. Use Copy for ChatGPT Premium Lead if you need a full council packet.')
     : (copied
-      ? 'Grok tab blocked. Full council report copied; open grok.com and paste.'
-      : 'Grok tab blocked. Copy the full council report from the dialog and open grok.com.');
+      ? 'Grok tab blocked. Full council report copied. Open grok.com, sign in, and paste it.'
+      : 'Grok tab blocked. Try again from your main browser, or copy the report manually.');
 };
 
 document.getElementById('run').onclick=async()=>{
