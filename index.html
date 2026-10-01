@@ -148,11 +148,11 @@ document.getElementById('checkConnection').onclick=async()=>{
     display.textContent='Checking Vercel preview session...';
     const proxy=await probe('proxy');
     display.textContent='Vercel proxy: '+proxy;
-    if(proxy!=='OK'){display.textContent+='\\nIf this is a preview-auth issue, reopen the newest study link in Chrome and sign in to Vercel if prompted.';return;}
-    display.textContent+='\\nChecking Cloudflare backend...';
+    if(proxy!=='OK'){display.textContent+='\nIf this is a preview-auth issue, reopen the newest study link in Chrome and sign in to Vercel if prompted.';return;}
+    display.textContent+='\nChecking Cloudflare backend...';
     const backend=await probe('backend');
-    display.textContent='Vercel proxy: '+proxy+'\\nCloudflare backend: '+backend;
-    if(backend.startsWith('OK'))display.textContent+='\\nConnection looks healthy. Try a SHORT council task first.';
+    display.textContent='Vercel proxy: '+proxy+'\nCloudflare backend: '+backend;
+    if(backend.startsWith('OK'))display.textContent+='\nConnection looks healthy. Try a SHORT council task first.';
   }catch(error){
     display.textContent='Diagnostic error: '+String(error?.message||error);
   }finally{button.disabled=false;}
