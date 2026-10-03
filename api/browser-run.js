@@ -203,6 +203,54 @@ export default async function handler(req, res) {
   if (req.method === 'GET') {
     let runtimeOidc = false;
     try { runtimeOidc = Boolean(await getVercelOidcToken()); } catch {}
+
+    if (req.query?.smoke === 'full') {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(403).json({ error: 'Smoke test is preview-only.' });
+      }
+      let browser;
+      try {
+        const executablePath = await chromium.executablePath();
+        browser = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: { width: 1280, height: 800 },
+          executablePath,
+          headless: true,
+        });
+        const page = await browser.newPage();
+        await page.goto('https://example.com', { waitUntil: 'domcontentloaded', timeout: 12000 });
+        const snapshot = await annotate(page);
+        const action = await gatewayPlan(
+          'Tell me the page title and what this page is for.',
+          snapshot,
+          [],
+          true
+        );
+        return res.status(200).json({
+          ok: true,
+          smoke: 'full',
+          chromium: true,
+          aiGateway: true,
+          oidcRuntime: runtimeOidc,
+          pageTitle: snapshot.title,
+          pageUrl: snapshot.url,
+          plannerAction: action.action,
+          answer: clean(action.answer, 2000),
+        });
+      } catch (error) {
+        return res.status(500).json({
+          ok: false,
+          smoke: 'full',
+          oidcRuntime: runtimeOidc,
+          error: clean(error?.message || 'Smoke test failed.', 1000),
+        });
+      } finally {
+        if (browser) {
+          try { await browser.close(); } catch {}
+        }
+      }
+    }
+
     return res.status(200).json({
       ok: true,
       service: 'Counterpart Browser Cloud',
