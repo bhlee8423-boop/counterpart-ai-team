@@ -157,6 +157,20 @@ function needsApproval(action, snapshot) {
   return false;
 }
 
+function mustFinishAfterNavigation(task, trace, snapshot) {
+  const last = trace.at(-1);
+  if (!last || last.action !== 'click') return false;
+  const previousUrl = last.page?.url || last.url || '';
+  if (!previousUrl || previousUrl === snapshot.url) return false;
+
+  const t = String(task || '').toLowerCase();
+  return (
+    /\b(exactly once|one time|only once)\b/.test(t) ||
+    /\bafter\b.{0,80}\b(destination|page|link)\b/.test(t) ||
+    /\bthen\b.{0,80}\b(stop|tell|report|summari[sz]e|show|give)\b/.test(t)
+  );
+}
+
 async function execute(page, action) {
   if (['click','type','select'].includes(action.action) && !/^cp-\d+$/.test(String(action.id || ''))) {
     throw new Error('Planner returned an invalid element id.');
@@ -261,6 +275,22 @@ export default async function handler(req, res) {
 
         for (let step = 0; step < 3; step++) {
           const snapshot = await annotate(page);
+          if (mustFinishAfterNavigation(task, trace, snapshot)) {
+            const final = await gatewayPlan(task, snapshot, trace, true);
+            return res.status(200).json({
+              ok: true,
+              smoke: 'interact',
+              chromium: true,
+              planner: true,
+              interaction: true,
+              plannerProvider: PLANNER_PROVIDER,
+              finalUrl: snapshot.url,
+              pageTitle: snapshot.title,
+              answer: clean(final.answer || ('Reached ' + snapshot.title + ' at ' + snapshot.url), 2000),
+              steps: trace.concat([{ step: step + 1, action: 'finish', reason: 'Explicit post-navigation stop enforced.', url: snapshot.url }]),
+              guard: 'explicit-post-navigation-stop',
+            });
+          }
           const action = await gatewayPlan(task, snapshot, trace, false);
           const target = elementById(snapshot, action.id);
           trace.push({
@@ -360,6 +390,24 @@ export default async function handler(req, res) {
 
     for (let step = 0; step < maxSteps; step++) {
       const snapshot = await annotate(page);
+      if (mustFinishAfterNavigation(task, trace, snapshot)) {
+        const final = await gatewayPlan(task, snapshot, trace, true);
+        trace.push({
+          step: step + 1,
+          page: { title: snapshot.title, url: snapshot.url },
+          action: 'finish',
+          reason: 'Explicit post-navigation stop enforced.',
+          target: null,
+        });
+        return res.status(200).json({
+          ok: true, version: VERSION, status: 'completed',
+          answer: clean(final.answer || ('Reached ' + snapshot.title + ' at ' + snapshot.url), 6000),
+          finalUrl: snapshot.url,
+          pageTitle: snapshot.title,
+          steps: trace,
+          guard: 'explicit-post-navigation-stop',
+        });
+      }
       const action = await gatewayPlan(task, snapshot, trace, false);
       const target = elementById(snapshot, action.id);
       const record = {
