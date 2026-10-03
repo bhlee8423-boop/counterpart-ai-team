@@ -1,0 +1,39 @@
+name: Deploy Counterpart Browser Cloud
+
+on:
+  push:
+    branches:
+      - feature/counterpart-browser-cloud-v1
+    paths:
+      - 'browser-worker/**'
+      - '.github/workflows/deploy-browser-cloud.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: browser-worker
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+          cache-dependency-path: browser-worker/package-lock.json
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Deploy browser Worker
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
