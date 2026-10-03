@@ -5,6 +5,7 @@
   "type": "module",
   "dependencies": {
     "@sparticuz/chromium": "^141.0.0",
-    "puppeteer-core": "^23.11.0"
+    "puppeteer-core": "^23.11.0",
+    "@vercel/oidc": "^3.0.0"
   }
 }
