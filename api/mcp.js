@@ -145,19 +145,46 @@ async function protocolSmoke(req, res) {
   const listRes = await mcpHandler(listReq);
   const listText = await listRes.text();
 
-  return res.status(initRes.ok && listRes.ok ? 200 : 500).json({
-    ok: initRes.ok && listRes.ok,
+  let callStatus = null;
+  let callText = '';
+  if (req.query?.smoke === 'call') {
+    const callReq = new Request('https://localhost/api/mcp', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json', accept: 'application/json, text/event-stream' },
+      body: JSON.stringify({
+        jsonrpc: '2.0',
+        id: 3,
+        method: 'tools/call',
+        params: {
+          name: TOOL_NAME,
+          arguments: {
+            url: 'https://example.com',
+            task: 'Tell me the page title and what this page is for.',
+            maxSteps: 2,
+          },
+        },
+      }),
+    });
+    const callRes = await mcpHandler(callReq);
+    callStatus = callRes.status;
+    callText = await callRes.text();
+  }
+
+  const callOk = callStatus == null || (callStatus >= 200 && callStatus < 300);
+  return res.status(initRes.ok && listRes.ok && callOk ? 200 : 500).json({
+    ok: initRes.ok && listRes.ok && callOk,
     endpoint: '/api/mcp',
     tool: TOOL_NAME,
     initialize: { status: initRes.status, body: initText.slice(0, 2000) },
     toolsList: { status: listRes.status, body: listText.slice(0, 4000) },
+    toolCall: callStatus == null ? null : { status: callStatus, body: callText.slice(0, 6000) },
   });
 }
 
 export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
-  if (req.method === 'GET' && req.query?.smoke === 'protocol') {
+  if (req.method === 'GET' && ['protocol', 'call'].includes(String(req.query?.smoke || ''))) {
     if (process.env.VERCEL_ENV === 'production') {
       return res.status(403).json({ error: 'MCP smoke test is preview-only.' });
     }
