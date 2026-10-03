@@ -98,6 +98,9 @@ Rules:
 - Never enter passwords, passcodes, payment data, banking data, or government identifiers.
 - If a consequential action would be needed, finish and say approval is required.
 - Keep navigation focused on the user's stated task.
+- Each browser step is costly. Do not click a link just because its label resembles a link clicked earlier.
+- If history shows that a click navigated to a new URL, check whether that navigation already satisfied the requested action. If the user asked to open/follow/click something and then report or inspect the destination, FINISH on that destination before clicking anything else.
+- Do not repeat the same link label on consecutive pages unless the task explicitly requires repeated navigation.
 ${forceFinish ? '- You have no browser actions left. You MUST choose finish and summarize only what is supported by the snapshot/history.' : '- Finish as soon as the requested information is obtained.'}`;
 
   const sinceLast = Date.now() - lastPlannerRequestAt;
@@ -253,13 +256,20 @@ export default async function handler(req, res) {
         });
         const page = await browser.newPage();
         await page.goto('https://example.com', { waitUntil: 'domcontentloaded', timeout: 12000 });
-        const task = 'Click the More information link. After the destination loads, tell me the destination page title and URL.';
+        const task = 'Click the Learn more link exactly once. After that destination loads, stop browsing and tell me the destination page title and URL.';
         const trace = [];
 
         for (let step = 0; step < 3; step++) {
           const snapshot = await annotate(page);
           const action = await gatewayPlan(task, snapshot, trace, false);
-          trace.push({ step: step + 1, action: action.action, reason: clean(action.reason, 240), url: snapshot.url });
+          const target = elementById(snapshot, action.id);
+          trace.push({
+            step: step + 1,
+            action: action.action,
+            reason: clean(action.reason, 240),
+            url: snapshot.url,
+            target: target ? { label: clean(target.label, 140), href: clean(target.href, 500) } : null,
+          });
 
           if (action.action === 'finish') {
             return res.status(200).json({
@@ -351,11 +361,13 @@ export default async function handler(req, res) {
     for (let step = 0; step < maxSteps; step++) {
       const snapshot = await annotate(page);
       const action = await gatewayPlan(task, snapshot, trace, false);
+      const target = elementById(snapshot, action.id);
       const record = {
         step: step + 1,
         page: { title: snapshot.title, url: snapshot.url },
         action: action.action,
-        reason: clean(action.reason, 240)
+        reason: clean(action.reason, 240),
+        target: target ? { label: clean(target.label, 140), href: clean(target.href, 500) } : null,
       };
 
       if (action.action === 'finish') {
@@ -367,6 +379,33 @@ export default async function handler(req, res) {
           pageTitle: snapshot.title,
           steps: trace,
         });
+      }
+
+      if (action.action === 'click' && record.target?.label) {
+        const normalized = record.target.label.toLowerCase().replace(/\s+/g, ' ').trim();
+        const repeated = trace.slice(-2).some(prev =>
+          prev.action === 'click' &&
+          prev.target?.label &&
+          prev.target.label.toLowerCase().replace(/\s+/g, ' ').trim() === normalized &&
+          prev.page?.url !== snapshot.url
+        );
+        if (repeated) {
+          const final = await gatewayPlan(
+            task + '\nA repeated-link safety guard stopped another click. Summarize the useful result from the current page now.',
+            snapshot,
+            trace,
+            true
+          );
+          trace.push({ ...record, action: 'finish', reason: 'Repeated-link navigation guard.' });
+          return res.status(200).json({
+            ok: true, version: VERSION, status: 'completed',
+            answer: clean(final.answer || 'The requested navigation reached this page, and the repeated-link guard stopped further browsing.', 6000),
+            finalUrl: snapshot.url,
+            pageTitle: snapshot.title,
+            steps: trace,
+            guard: 'repeated-link',
+          });
+        }
       }
 
       if (needsApproval(action, snapshot)) {
