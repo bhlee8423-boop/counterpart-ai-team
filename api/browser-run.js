@@ -1,5 +1,6 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
+import { getVercelOidcToken } from '@vercel/oidc';
 
 const VERSION = '0.2.0-vercel';
 const MODEL = 'zai/glm-5.3-flash';
@@ -94,7 +95,9 @@ async function annotate(page) {
 }
 
 async function gatewayPlan(task, snapshot, history, forceFinish = false) {
-  const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY || process.env.VERCEL_OIDC_TOKEN;
+  let runtimeOidc = '';
+  try { runtimeOidc = await getVercelOidcToken(); } catch {}
+  const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY || runtimeOidc || process.env.VERCEL_OIDC_TOKEN;
   if (!token) throw new Error('No Vercel AI Gateway credential is available. Enable project OIDC or configure an AI Gateway key.');
 
   const system = `You are Counterpart Browser Planner.
@@ -198,6 +201,8 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'GET') {
+    let runtimeOidc = false;
+    try { runtimeOidc = Boolean(await getVercelOidcToken()); } catch {}
     return res.status(200).json({
       ok: true,
       service: 'Counterpart Browser Cloud',
@@ -205,7 +210,8 @@ export default async function handler(req, res) {
       runtime: 'Vercel Chromium + Vercel AI Gateway',
       model: MODEL,
       previewOnly: true,
-      oidc: Boolean(process.env.VERCEL_OIDC_TOKEN),
+      oidcEnv: Boolean(process.env.VERCEL_OIDC_TOKEN),
+      oidcRuntime: runtimeOidc,
       aiGatewayKey: Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY),
     });
   }
