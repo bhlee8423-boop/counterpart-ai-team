@@ -107,37 +107,52 @@ ${forceFinish ? '- You have no browser actions left. You MUST choose finish and 
   if (sinceLast < 1100) await new Promise(r => setTimeout(r, 1100 - sinceLast));
   lastPlannerRequestAt = Date.now();
 
-  const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), 15000);
-  try {
-    const response = await fetch('https://api.llm7.io/v1/chat/completions', {
-      method: 'POST',
-      signal: controller.signal,
-      headers: {
-        Authorization: 'Bearer ' + (process.env.LLM7_API_KEY || 'whatever'),
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        model: MODEL,
-        temperature: 0.1,
-        max_tokens: 260,
-        messages: [
-          { role: 'system', content: system },
-          { role: 'user', content: JSON.stringify({ task, page: snapshot, recentHistory: history.slice(-5) }) }
-        ]
-      })
-    });
+  const apiKey = process.env.LLM7_API_KEY || 'counterpart-browser-preview-v1';
+  const payload = JSON.stringify({
+    model: MODEL,
+    temperature: 0.1,
+    max_tokens: 260,
+    messages: [
+      { role: 'system', content: system },
+      { role: 'user', content: JSON.stringify({ task, page: snapshot, recentHistory: history.slice(-5) }) }
+    ]
+  });
 
-    const raw = await response.text();
-    let data;
-    try { data = JSON.parse(raw); } catch { throw new Error('LLM7 returned a non-JSON response.'); }
-    if (!response.ok) {
-      throw new Error(data?.error?.message || data?.error || 'LLM7 request failed (' + response.status + ').');
+  for (let attempt = 0; attempt < 3; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch('https://api.llm7.io/v1/chat/completions', {
+        method: 'POST',
+        signal: controller.signal,
+        headers: {
+          Authorization: 'Bearer ' + apiKey,
+          'Content-Type': 'application/json'
+        },
+        body: payload
+      });
+
+      const raw = await response.text();
+      let data;
+      try { data = JSON.parse(raw); } catch { throw new Error('LLM7 returned a non-JSON response.'); }
+
+      if (response.status === 429 && attempt < 2) {
+        const retryAfter = Math.max(1, Math.min(Number(response.headers.get('retry-after')) || 1, 3));
+        await new Promise(r => setTimeout(r, retryAfter * 1000 + 250));
+        lastPlannerRequestAt = Date.now();
+        continue;
+      }
+
+      if (!response.ok) {
+        throw new Error(data?.error?.message || data?.error || 'LLM7 request failed (' + response.status + ').');
+      }
+      return parseJsonObject(data?.choices?.[0]?.message?.content || '');
+    } finally {
+      clearTimeout(timer);
     }
-    return parseJsonObject(data?.choices?.[0]?.message?.content || '');
-  } finally {
-    clearTimeout(timer);
   }
+
+  throw new Error('LLM7 free test rate limit did not clear after retries.');
 }
 
 function elementById(snapshot, id) {
