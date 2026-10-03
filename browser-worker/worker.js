@@ -154,18 +154,24 @@ function requiresApproval(action, snapshot) {
 }
 
 async function execute(page, action) {
+  if (!/^cp-\\d+$/.test(String(action.id || '')) && ['click','type','select'].includes(action.action)) {
+    throw new Error('Planner returned an invalid element id.');
+  }
+  const selector = action.id ? '[data-cp-id="' + action.id + '"]' : '';
+
   if (action.action === 'click') {
-    await page.locator('[data-cp-id="' + CSS.escape(action.id) + '"]').click();
+    await page.click(selector);
     await new Promise(r => setTimeout(r, 700));
     return;
   }
   if (action.action === 'type') {
-    const selector = '[data-cp-id="' + CSS.escape(action.id) + '"]';
-    await page.locator(selector).fill(String(action.text ?? ''));
+    await page.click(selector, { clickCount: 3 });
+    await page.keyboard.press('Backspace');
+    await page.type(selector, String(action.text ?? ''), { delay: 15 });
     return;
   }
   if (action.action === 'select') {
-    await page.select('[data-cp-id="' + CSS.escape(action.id) + '"]', String(action.value ?? ''));
+    await page.select(selector, String(action.value ?? ''));
     return;
   }
   if (action.action === 'navigate') {
