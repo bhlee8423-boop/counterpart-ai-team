@@ -1,9 +1,9 @@
 import puppeteer from 'puppeteer-core';
 import chromium from '@sparticuz/chromium';
-import { getVercelOidcToken } from '@vercel/oidc';
 
-const VERSION = '0.2.0-vercel';
-const MODEL = 'zai/glm-5.3-flash';
+const VERSION = '0.3.0-vercel';
+const MODEL = 'fast';
+const PLANNER_PROVIDER = 'LLM7 test API';
 const CONSEQUENTIAL = /\b(buy|purchase|place order|checkout|pay|payment|book|reserve|submit|send|publish|post|delete|remove|cancel|confirm|accept|sign|agree|transfer|withdraw|deposit|change password|reset password|close account)\b/i;
 const SENSITIVE = /password|passcode|pin|card|credit|cvv|cvc|social security|ssn|bank|routing|account number/i;
 
@@ -39,23 +39,6 @@ function parseJsonObject(text) {
     try { return JSON.parse(raw.slice(start, end + 1)); } catch {}
   }
   throw new Error('Planner returned invalid JSON.');
-}
-
-async function getChromiumPath() {
-  if (cachedExecutablePath) return cachedExecutablePath;
-  if (!executablePromise) {
-    const host = process.env.VERCEL_URL;
-    if (!host) throw new Error('VERCEL_URL is unavailable.');
-    const pack = 'https://' + host + '/chromium-pack.tar';
-    executablePromise = chromium.executablePath(pack).then(path => {
-      cachedExecutablePath = path;
-      return path;
-    }).catch(err => {
-      executablePromise = null;
-      throw err;
-    });
-  }
-  return executablePromise;
 }
 
 async function annotate(page) {
@@ -95,11 +78,6 @@ async function annotate(page) {
 }
 
 async function gatewayPlan(task, snapshot, history, forceFinish = false) {
-  let runtimeOidc = '';
-  try { runtimeOidc = await getVercelOidcToken(); } catch {}
-  const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY || runtimeOidc || process.env.VERCEL_OIDC_TOKEN;
-  if (!token) throw new Error('No Vercel AI Gateway credential is available. Enable project OIDC or configure an AI Gateway key.');
-
   const system = `You are Counterpart Browser Planner.
 Choose exactly ONE next browser action and return ONLY a JSON object.
 
@@ -121,29 +99,37 @@ Rules:
 - Keep navigation focused on the user's stated task.
 ${forceFinish ? '- You have no browser actions left. You MUST choose finish and summarize only what is supported by the snapshot/history.' : '- Finish as soon as the requested information is obtained.'}`;
 
-  const response = await fetch('https://ai-gateway.vercel.sh/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: 'Bearer ' + token,
-      'Content-Type': 'application/json',
-      'x-ai-gateway-tags': 'counterpart-browser,preview-free-first'
-    },
-    body: JSON.stringify({
-      model: MODEL,
-      temperature: 0.1,
-      max_tokens: 260,
-      messages: [
-        { role: 'system', content: system },
-        { role: 'user', content: JSON.stringify({ task, page: snapshot, recentHistory: history.slice(-5) }) }
-      ]
-    })
-  });
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
+  try {
+    const response = await fetch('https://api.llm7.io/v1/chat/completions', {
+      method: 'POST',
+      signal: controller.signal,
+      headers: {
+        Authorization: 'Bearer ' + (process.env.LLM7_API_KEY || 'whatever'),
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        model: MODEL,
+        temperature: 0.1,
+        max_tokens: 260,
+        messages: [
+          { role: 'system', content: system },
+          { role: 'user', content: JSON.stringify({ task, page: snapshot, recentHistory: history.slice(-5) }) }
+        ]
+      })
+    });
 
-  const raw = await response.text();
-  let data;
-  try { data = JSON.parse(raw); } catch { throw new Error('AI Gateway returned a non-JSON response.'); }
-  if (!response.ok) throw new Error(data?.error?.message || 'AI Gateway request failed (' + response.status + ').');
-  return parseJsonObject(data?.choices?.[0]?.message?.content || '');
+    const raw = await response.text();
+    let data;
+    try { data = JSON.parse(raw); } catch { throw new Error('LLM7 returned a non-JSON response.'); }
+    if (!response.ok) {
+      throw new Error(data?.error?.message || data?.error || 'LLM7 request failed (' + response.status + ').');
+    }
+    return parseJsonObject(data?.choices?.[0]?.message?.content || '');
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 function elementById(snapshot, id) {
@@ -201,9 +187,6 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'GET') {
-    let runtimeOidc = false;
-    try { runtimeOidc = Boolean(await getVercelOidcToken()); } catch {}
-
     if (req.query?.smoke === 'full') {
       if (process.env.VERCEL_ENV === 'production') {
         return res.status(403).json({ error: 'Smoke test is preview-only.' });
@@ -230,8 +213,8 @@ export default async function handler(req, res) {
           ok: true,
           smoke: 'full',
           chromium: true,
-          aiGateway: true,
-          oidcRuntime: runtimeOidc,
+          planner: true,
+          plannerProvider: PLANNER_PROVIDER,
           pageTitle: snapshot.title,
           pageUrl: snapshot.url,
           plannerAction: action.action,
@@ -241,7 +224,6 @@ export default async function handler(req, res) {
         return res.status(500).json({
           ok: false,
           smoke: 'full',
-          oidcRuntime: runtimeOidc,
           error: clean(error?.message || 'Smoke test failed.', 1000),
         });
       } finally {
@@ -255,12 +237,12 @@ export default async function handler(req, res) {
       ok: true,
       service: 'Counterpart Browser Cloud',
       version: VERSION,
-      runtime: 'Vercel Chromium + Vercel AI Gateway',
+      runtime: 'Vercel Chromium + LLM7 test planner',
       model: MODEL,
       previewOnly: true,
-      oidcEnv: Boolean(process.env.VERCEL_OIDC_TOKEN),
-      oidcRuntime: runtimeOidc,
-      aiGatewayKey: Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY),
+      plannerProvider: PLANNER_PROVIDER,
+      plannerAuthMode: process.env.LLM7_API_KEY ? 'free-token' : 'test-key',
+      freeTokenConfigured: Boolean(process.env.LLM7_API_KEY),
     });
   }
 
