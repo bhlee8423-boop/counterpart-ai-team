@@ -94,8 +94,8 @@ async function annotate(page) {
 }
 
 async function gatewayPlan(task, snapshot, history, forceFinish = false) {
-  const token = process.env.VERCEL_OIDC_TOKEN;
-  if (!token) throw new Error('Vercel OIDC is not enabled for this project.');
+  const token = process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY || process.env.VERCEL_OIDC_TOKEN;
+  if (!token) throw new Error('No Vercel AI Gateway credential is available. Enable project OIDC or configure an AI Gateway key.');
 
   const system = `You are Counterpart Browser Planner.
 Choose exactly ONE next browser action and return ONLY a JSON object.
@@ -206,6 +206,7 @@ export default async function handler(req, res) {
       model: MODEL,
       previewOnly: true,
       oidc: Boolean(process.env.VERCEL_OIDC_TOKEN),
+      aiGatewayKey: Boolean(process.env.AI_GATEWAY_API_KEY || process.env.VERCEL_AI_GATEWAY_KEY),
     });
   }
 
