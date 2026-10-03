@@ -4,6 +4,7 @@ import chromium from '@sparticuz/chromium';
 const VERSION = '0.3.0-vercel';
 const MODEL = 'fast';
 const PLANNER_PROVIDER = 'LLM7 test API';
+let lastPlannerRequestAt = 0;
 const CONSEQUENTIAL = /\b(buy|purchase|place order|checkout|pay|payment|book|reserve|submit|send|publish|post|delete|remove|cancel|confirm|accept|sign|agree|transfer|withdraw|deposit|change password|reset password|close account)\b/i;
 const SENSITIVE = /password|passcode|pin|card|credit|cvv|cvc|social security|ssn|bank|routing|account number/i;
 
@@ -98,6 +99,10 @@ Rules:
 - If a consequential action would be needed, finish and say approval is required.
 - Keep navigation focused on the user's stated task.
 ${forceFinish ? '- You have no browser actions left. You MUST choose finish and summarize only what is supported by the snapshot/history.' : '- Finish as soon as the requested information is obtained.'}`;
+
+  const sinceLast = Date.now() - lastPlannerRequestAt;
+  if (sinceLast < 1100) await new Promise(r => setTimeout(r, 1100 - sinceLast));
+  lastPlannerRequestAt = Date.now();
 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), 15000);
@@ -225,6 +230,74 @@ export default async function handler(req, res) {
           ok: false,
           smoke: 'full',
           error: clean(error?.message || 'Smoke test failed.', 1000),
+        });
+      } finally {
+        if (browser) {
+          try { await browser.close(); } catch {}
+        }
+      }
+    }
+
+    if (req.query?.smoke === 'interact') {
+      if (process.env.VERCEL_ENV === 'production') {
+        return res.status(403).json({ error: 'Smoke test is preview-only.' });
+      }
+      let browser;
+      try {
+        const executablePath = await chromium.executablePath();
+        browser = await puppeteer.launch({
+          args: chromium.args,
+          defaultViewport: { width: 1280, height: 800 },
+          executablePath,
+          headless: true,
+        });
+        const page = await browser.newPage();
+        await page.goto('https://example.com', { waitUntil: 'domcontentloaded', timeout: 12000 });
+        const task = 'Click the More information link. After the destination loads, tell me the destination page title and URL.';
+        const trace = [];
+
+        for (let step = 0; step < 3; step++) {
+          const snapshot = await annotate(page);
+          const action = await gatewayPlan(task, snapshot, trace, false);
+          trace.push({ step: step + 1, action: action.action, reason: clean(action.reason, 240), url: snapshot.url });
+
+          if (action.action === 'finish') {
+            return res.status(200).json({
+              ok: snapshot.url !== 'https://example.com/',
+              smoke: 'interact',
+              chromium: true,
+              planner: true,
+              interaction: snapshot.url !== 'https://example.com/',
+              plannerProvider: PLANNER_PROVIDER,
+              finalUrl: snapshot.url,
+              pageTitle: snapshot.title,
+              answer: clean(action.answer, 2000),
+              steps: trace,
+            });
+          }
+          if (needsApproval(action, snapshot)) throw new Error('Smoke planner unexpectedly requested a protected action.');
+          await execute(page, action);
+        }
+
+        const snapshot = await annotate(page);
+        const final = await gatewayPlan(task, snapshot, trace, true);
+        return res.status(200).json({
+          ok: snapshot.url !== 'https://example.com/',
+          smoke: 'interact',
+          chromium: true,
+          planner: true,
+          interaction: snapshot.url !== 'https://example.com/',
+          plannerProvider: PLANNER_PROVIDER,
+          finalUrl: snapshot.url,
+          pageTitle: snapshot.title,
+          answer: clean(final.answer, 2000),
+          steps: trace,
+        });
+      } catch (error) {
+        return res.status(500).json({
+          ok: false,
+          smoke: 'interact',
+          error: clean(error?.message || 'Interaction smoke test failed.', 1000),
         });
       } finally {
         if (browser) {
