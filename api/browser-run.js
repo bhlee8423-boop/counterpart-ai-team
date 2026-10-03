@@ -1,13 +1,11 @@
 import puppeteer from 'puppeteer-core';
-import chromium from '@sparticuz/chromium-min';
+import chromium from '@sparticuz/chromium';
 
 const VERSION = '0.2.0-vercel';
 const MODEL = 'zai/glm-5.3-flash';
 const CONSEQUENTIAL = /\b(buy|purchase|place order|checkout|pay|payment|book|reserve|submit|send|publish|post|delete|remove|cancel|confirm|accept|sign|agree|transfer|withdraw|deposit|change password|reset password|close account)\b/i;
 const SENSITIVE = /password|passcode|pin|card|credit|cvv|cvc|social security|ssn|bank|routing|account number/i;
 
-let cachedExecutablePath = null;
-let executablePromise = null;
 
 function clean(value, max = 8000) {
   return String(value ?? '').trim().slice(0, max);
@@ -229,7 +227,7 @@ export default async function handler(req, res) {
   let browser;
 
   try {
-    const executablePath = await getChromiumPath();
+    const executablePath = await chromium.executablePath();
     browser = await puppeteer.launch({
       args: chromium.args,
       defaultViewport: { width: 1280, height: 800 },
