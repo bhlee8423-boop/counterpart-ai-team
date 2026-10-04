@@ -1,0 +1,4 @@
+node_modules/
+.vercel/
+services/browser-cloud/browser.html
+*.log

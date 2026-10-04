@@ -1,6 +1,7 @@
 import { createMcpHandler } from 'mcp-handler';
 import { z } from 'zod';
 import browserHandler from './browser-run.js';
+import { productionDisabled, dedicatedService } from '../lib/browser-safety.js';
 
 const TOOL_NAME = 'browse_web';
 
@@ -16,10 +17,12 @@ function callBrowser(body) {
     const res = {
       setHeader(name, value) { result.headers[name] = value; },
       status(code) { result.statusCode = code; return this; },
-      json(data) { resolve({ status: result.statusCode, data }); return this; },
-      send(data) { resolve({ status: result.statusCode, data }); return this; },
+      json(data) { result.data = data; return this; },
+      send(data) { result.data = data; return this; },
     };
-    Promise.resolve(browserHandler(req, res)).catch(reject);
+    Promise.resolve(browserHandler(req, res))
+      .then(() => resolve({ status: result.statusCode, data: result.data }))
+      .catch(reject);
   });
 }
 
@@ -73,12 +76,13 @@ const mcpHandler = createMcpHandler((server) => {
           pageTitle: data.pageTitle,
           steps: data.steps,
           pendingAction: data.pendingAction,
+          guard: data.guard,
         },
       };
     },
   );
 }, {
-  serverInfo: { name: 'Counterpart Browser Cloud', version: '0.1.0' },
+  serverInfo: { name: 'Counterpart Browser Cloud', version: '0.4.0' },
   instructions:
     'Use browse_web only for bounded public-web navigation and information retrieval. Do not use it for consequential actions, authentication, private account data, or sensitive credentials.',
 });
@@ -185,13 +189,13 @@ export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
 
   if (req.method === 'GET' && ['protocol', 'call'].includes(String(req.query?.smoke || ''))) {
-    if (process.env.VERCEL_ENV === 'production') {
+    if (process.env.VERCEL_ENV === 'production' || dedicatedService()) {
       return res.status(403).json({ error: 'MCP smoke test is preview-only.' });
     }
     return protocolSmoke(req, res);
   }
 
-  if (process.env.VERCEL_ENV === 'production') {
+  if (productionDisabled()) {
     return res.status(403).json({
       error: 'Counterpart Browser MCP is intentionally preview-only until tool verification is complete.',
       code: 'PREVIEW_ONLY',

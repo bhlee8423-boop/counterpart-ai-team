@@ -14,12 +14,12 @@
     <p>Cloud browser automation. Your computer can be off.</p>
   </div>
   <div class="card">
-    <div class="ok">Preview test build · Vercel Chromium · zero-card test planner · no TinyFish runtime</div>
+    <div class="ok">Public-web browser · Up to 7 steps per task</div>
     <label>Starting URL</label>
     <input id="url" value="https://example.com">
     <label>What should the browser do?</label>
     <textarea id="task">Tell me the page title and what this page is for.</textarea>
-    <div class="small">For this first preview, use public pages only. The browser stops before purchases, submissions, messages, deletions, bookings, account changes, or sensitive credential entry.</div>
+    <div class="small">Read public pages and follow links. The browser stops before purchases, submissions, messages, deletions, bookings, account changes, or sensitive credential entry.</div>
     <button id="run">Run cloud browser</button>
     <div id="status" class="status">Ready.</div>
     <div id="output" class="output">Results will appear here.</div>
@@ -38,7 +38,7 @@ document.getElementById('run').onclick=async()=>{
     if(!r.ok)throw new Error(data.error||('Request failed '+r.status));
     out.textContent=(data.answer||'(no answer)')+'\n\nStatus: '+data.status+'\nFinal page: '+(data.finalUrl||'')+
       (data.pendingAction?'\n\nStopped before: '+JSON.stringify(data.pendingAction,null,2):'');
-    st.textContent=data.status==='completed'?'Complete.':data.status==='approval_required'?'Stopped for approval.':'Stopped at task limit.';
+    st.textContent=data.status==='completed'?'Complete.':data.status==='approval_required'?'Stopped at a protected action.':'Stopped at task limit.';
   }catch(e){out.textContent='Error: '+e.message;st.textContent='Could not run.'}finally{btn.disabled=false}
 };
 </script>
