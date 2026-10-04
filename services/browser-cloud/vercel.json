@@ -1,0 +1,13 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "outputDirectory": "public",
+  "env": {
+    "COUNTERPART_BROWSER_SERVICE": "dedicated-v1",
+    "COUNTERPART_BROWSER_PROJECT_ID": "prj_W6UoNfPuV49vk0ywIw1hJXuCbIJL"
+  },
+  "functions": {
+    "api/browser-run.js": { "maxDuration": 60 },
+    "api/mcp.js": { "maxDuration": 60 }
+  },
+  "rewrites": [{ "source": "/", "destination": "/browser.html" }]
+}

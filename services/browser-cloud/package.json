@@ -1,0 +1,6 @@
+{
+  "name": "counterpart-browser-cloud",
+  "private": true,
+  "type": "module",
+  "scripts": { "build": "node ../../scripts/stage-browser-ui.mjs" }
+}

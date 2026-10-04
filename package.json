@@ -1,0 +1,13 @@
+{
+  "name": "counterpart-ai-team",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@sparticuz/chromium": "^141.0.0",
+    "puppeteer-core": "^23.11.0",
+    "mcp-handler": "^2.1.0",
+    "@modelcontextprotocol/server": "^2.0.0",
+    "zod": "^4.2.0"
+  }
+}
