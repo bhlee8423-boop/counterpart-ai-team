@@ -11,6 +11,7 @@ existing `browser.html`. The parent Counterpart production project is unchanged.
 - Root directory: `services/browser-cloud`.
 - Install command: `npm --prefix ../.. ci --ignore-scripts --no-audit --no-fund`.
 - Build command: `npm run build`.
+- Static output: `public` (the build stages the existing UI there).
 - Enable files outside the root directory for shared handlers/dependencies.
 - Production service enablement uses explicit, non-secret dedicated identifiers
   in `vercel.json`. Automatic system-environment exposure is unnecessary.
